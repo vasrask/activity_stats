@@ -85,73 +85,44 @@ Run tests with:
 python -m unittest
 ```
 
-## Deploy from the command line with GitHub Pages
+## Continuous integration and GitHub Pages deployment
 
-The generated site is plain HTML, CSS, and JavaScript; it does not need a web server or database at runtime. The `--output-dir` option copies the required stylesheet and Highcharts runtime into the output directory.
+The workflow in `.github/workflows/pages.yml` runs the unit tests on pull
+requests and pushes to `main`. After tests pass on a push to `main`, it deploys
+the committed `docs/` directory to GitHub Pages. It does not collect fresh
+GitHub activity; generate the site and commit the updated `docs/` when you
+want to publish new statistics.
 
 ### One-time setup
 
-Authenticate with an account that can administer the repository:
+1. Push this project to your GitHub repository.
+2. In the repository, open **Settings → Pages** and set the build and
+   deployment source to **GitHub Actions**.
+3. Ensure the repository's Actions settings allow the workflow to run. The
+   workflow needs the `pages: write` and `id-token: write` permissions declared
+   in its deploy job.
 
-```powershell
-gh auth login
-gh auth setup-git
-gh auth status
-```
+### Publish an updated dashboard
 
-In the project directory, set the GitHub repository and publishing branch:
-
-```powershell
-$repo = "OWNER/REPOSITORY"
-$branch = "main"
-gh repo set-default $repo
-```
-
-On Linux:
+From the project directory, regenerate the site, commit it, and push to `main`.
+For example:
 
 ```bash
-repo="OWNER/REPOSITORY"
-branch="main"
-gh repo set-default "$repo"
-```
-
-For a repository that does not have Pages enabled yet, configure it to publish the `docs/` directory from the selected branch:
-
-```powershell
-gh api --method POST "repos/$repo/pages" `
-  -f build_type=legacy `
-  -f "source[branch]=$branch" `
-  -f "source[path]=/docs"
-```
-
-If Pages is already enabled, update its source instead:
-
-```powershell
-gh api --method PUT "repos/$repo/pages" `
-  -f build_type=legacy `
-  -f "source[branch]=$branch" `
-  -f "source[path]=/docs"
-```
-
-The authenticated account needs permission to manage Pages settings. GitHub Pages must also be available for the repository.
-
-### Publish or update the site
-
-Each time you want to deploy an updated dashboard, run:
-
-```powershell
 python activity_stats.py
 git add docs
 git commit -m "Update activity dashboard"
 git push
 ```
 
-GitHub Pages builds the site after the push. You can find its URL with:
+Use `python3` instead of `python` on Linux. Tests run on GitHub before
+deployment; a failed test prevents the deployment. You can also manually
+trigger the deployment from the **Actions** tab or with GitHub CLI:
 
-```powershell
-gh api "repos/$repo/pages" --jq .html_url
+```bash
+gh workflow run pages.yml --repo vasrask/activity_stats --ref main
 ```
 
-The generated site is in `docs/` so it can be committed and used directly by GitHub Pages.
-
-Retain the SQLite database on the machine that collects the data to preserve its records and sync position. The database does not need to be uploaded with the generated pages.
+The Pages deployment serves the already-generated static files; the SQLite
+database is not uploaded and is not required by the hosted site. Keep the
+database on the machine where you collect activity so future runs can continue
+from the saved sync state.
