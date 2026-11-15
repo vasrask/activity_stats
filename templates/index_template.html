@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activity Stats</title>
+  <link rel="stylesheet" href="$root/activity_stats.css">
+  <script src="$charts"></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">Activity Stats</a>
+    <nav><ul>$nav_bars</ul></nav>
+  </header>
+  <main>
+    <p class="eyebrow">Open source project activity</p>
+    <h1>Repository activity</h1>
+    <p class="description">Daily and cumulative commits, forks, issues, and pull requests, with statistics grouped by release.</p>
+    $empty_state
+    <div class="repo-grid">$repo_cards</div>
+    $daily_chart
+    $cumulative_chart
+    <p class="note">Activity charts cover the last $days days. Repository totals are snapshots from collection dates; historical totals begin when collection starts.</p>
+  </main>
+  <footer>Generated $generated_on | Source data: GitHub REST API</footer>
+</body>
+</html>

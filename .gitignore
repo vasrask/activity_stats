@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Local database and SQLite sidecar files
+/activity_stats.db
+/activity_stats.db-*
+
+# Local environment and editor files
+.env
+.venv/
+venv/
+.vscode/
+.DS_Store
+Thumbs.db

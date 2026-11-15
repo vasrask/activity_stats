@@ -1,0 +1,93 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #17212b;
+  background: #f4f7fa;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem max(1.25rem, calc((100% - 1180px) / 2));
+  background: #132d46;
+  color: white;
+}
+.brand {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+nav a { color: #d9e8f6; text-decoration: none; }
+nav a:hover { color: white; text-decoration: underline; }
+main { max-width: 1180px; margin: 2rem auto; padding: 0 1.25rem; }
+h1 { margin: .2rem 0 1rem; font-size: clamp(2rem, 5vw, 3rem); }
+h1 a { color: inherit; text-decoration: none; }
+h2 { font-size: 1.25rem; }
+.eyebrow {
+  margin: 0;
+  color: #54718c;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.description, .meta, .note { color: #526170; line-height: 1.6; }
+.empty-state {
+  padding: 1rem;
+  border: 1px solid #e8ca85;
+  border-radius: .5rem;
+  background: #fff8e6;
+  color: #684d13;
+}
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.repo-card, .chart {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border: 1px solid #dce4ec;
+  border-radius: .75rem;
+  background: white;
+  box-shadow: 0 2px 8px #132d460a;
+}
+.repo-card h2 { margin-top: 0; }
+.repo-card a { color: #1466a3; text-decoration: none; }
+.repo-card p { min-height: 3rem; color: #526170; }
+.stats { display: flex; flex-wrap: wrap; gap: .6rem 1rem; }
+.stats span { color: #526170; font-size: .9rem; }
+.stats b { color: #17212b; }
+.chart-area { min-height: 340px; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: .65rem; border-bottom: 1px solid #e6ebf0; vertical-align: top; }
+th { color: #526170; font-size: .85rem; }
+footer {
+  max-width: 1180px;
+  margin: 2rem auto;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #dce4ec;
+  color: #667787;
+  font-size: .85rem;
+}
+@media (max-width: 680px) {
+  header { align-items: flex-start; flex-direction: column; }
+  nav ul { gap: .6rem 1rem; }
+  .chart { padding: .75rem; }
+  .chart-area { min-height: 280px; }
+}

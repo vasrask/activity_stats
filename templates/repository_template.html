@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$name activity | Activity Stats</title>
+  <link rel="stylesheet" href="$root/activity_stats.css">
+  <script src="$charts"></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">Activity Stats</a>
+    <nav><ul>$nav_bars</ul></nav>
+  </header>
+  <main>
+    <p class="eyebrow">Repository</p>
+    <h1><a href="$repository_url">$name</a></h1>
+    <p class="description">$description</p>
+    <p class="meta">Created $created_at | Default branch: $default_branch | Primary language: $language</p>
+    <p class="meta">Updated $updated_on. Activity and release commit counts cover the configured $days-day collection window.</p>
+    $activity_charts
+    <section class="chart">
+      <h2>Releases</h2>
+      <p>Each release page groups commits, forks, issue and pull request activity between that release and the previous release. Release entries are boundaries, not activity counts.</p>
+      <table>
+        <thead><tr><th>Release</th><th>Tag</th><th>Published</th><th>Commits</th><th>Forks</th><th>Issues opened / closed</th><th>PRs opened / closed</th><th>Contributors</th></tr></thead>
+        <tbody>$releases_table</tbody>
+      </table>
+    </section>
+    <section class="chart">
+      <h2>Top contributors</h2>
+      <table><thead><tr><th>#</th><th>Contributor</th><th>Commits</th></tr></thead><tbody>$contributor_rows</tbody></table>
+    </section>
+    <section class="chart">
+      <h2>Recent activity</h2>
+      <table><thead><tr><th>Date</th><th>Activity</th><th>Contributor</th><th>Details</th></tr></thead><tbody>$event_rows</tbody></table>
+    </section>
+  </main>
+  <footer>Activity collected from the GitHub REST API.</footer>
+</body>
+</html>
