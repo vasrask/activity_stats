@@ -321,10 +321,17 @@ def collection_start(
 ) -> dt.datetime:
     window_start = now - dt.timedelta(days=days)
     state = connection.execute(
-        "SELECT last_successful_sync FROM repository_sync_state WHERE full_name = ?",
+        """
+        SELECT initial_since, last_successful_sync
+        FROM repository_sync_state WHERE full_name = ?
+        """,
         (repository,),
     ).fetchone()
     if state is None:
+        return window_start
+
+    initial_since = parse_datetime(state["initial_since"])
+    if initial_since is not None and initial_since > window_start:
         return window_start
 
     last_success = parse_datetime(state["last_successful_sync"])
@@ -345,6 +352,7 @@ def save_sync_success(
             (full_name, initial_since, last_successful_sync)
         VALUES (?, ?, ?)
         ON CONFLICT(full_name) DO UPDATE SET
+            initial_since = MIN(repository_sync_state.initial_since, excluded.initial_since),
             last_successful_sync = excluded.last_successful_sync
         """,
         (

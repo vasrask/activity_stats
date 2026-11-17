@@ -49,7 +49,7 @@ Then, on Windows or Linux, collect data and write a deployable site to `docs/`:
 python activity_stats.py
 ```
 
-The first run requests up to 400 days of activity by default. Later runs use the repository's saved sync position and recheck the previous day to avoid gaps at the boundary. This works whether you run the program daily, less often, or on demand. The lookback is a rolling limit: if the program is not run for longer than the configured window, activity older than that window will not be backfilled. The `activity_stats.db` database is in the project directory by default and preserves collected data and sync positions between runs. Generated HTML, CSS, and JavaScript go to `docs/` by default.
+The first run requests up to 400 days of activity by default. If your existing database contains a shorter history, the next run expands it back to the configured lookback. That one-time expansion can re-request some recent records, but the database deduplicates them; afterward, runs use the saved sync position and recheck only the previous day to avoid gaps. This works whether you run the program daily, less often, or on demand. The lookback is a rolling limit: if the program is not run for longer than the configured window, activity older than that window will not be backfilled. The `activity_stats.db` database is in the project directory by default and preserves collected data and sync positions between runs. Generated HTML, CSS, and JavaScript go to `docs/` by default.
 
 ### Preview locally
 
@@ -87,25 +87,17 @@ python -m unittest
 
 ## Continuous integration and GitHub Pages deployment
 
-The workflow in `.github/workflows/pages.yml` runs the unit tests on pull
-requests and pushes to `main`. After tests pass on a push to `main`, it deploys
-the committed `docs/` directory to GitHub Pages. It does not collect fresh
-GitHub activity; generate the site and commit the updated `docs/` when you
-want to publish new statistics.
+The workflow in `.github/workflows/pages.yml` runs the unit tests on pull requests and pushes to `main`. After tests pass on a push to `main`, it deploys the committed `docs/` directory to GitHub Pages. It does not collect fresh GitHub activity; generate the site and commit the updated `docs/` when you want to publish new statistics.
 
 ### One-time setup
 
 1. Push this project to your GitHub repository.
-2. In the repository, open **Settings → Pages** and set the build and
-   deployment source to **GitHub Actions**.
-3. Ensure the repository's Actions settings allow the workflow to run. The
-   workflow needs the `pages: write` and `id-token: write` permissions declared
-   in its deploy job.
+2. In the repository, open **Settings → Pages** and set the build and deployment source to **GitHub Actions**.
+3. Ensure the repository's Actions settings allow the workflow to run. The workflow needs the `pages: write` and `id-token: write` permissions declared in its deploy job.
 
 ### Publish an updated dashboard
 
-From the project directory, regenerate the site, commit it, and push to `main`.
-For example:
+From the project directory, regenerate the site, commit it, and push to `main`. For example:
 
 ```bash
 python activity_stats.py
@@ -114,15 +106,10 @@ git commit -m "Update activity dashboard"
 git push
 ```
 
-Use `python3` instead of `python` on Linux. Tests run on GitHub before
-deployment; a failed test prevents the deployment. You can also manually
-trigger the deployment from the **Actions** tab or with GitHub CLI:
+Tests run on GitHub before deployment; a failed test prevents the deployment. You can also manually trigger the deployment from the **Actions** tab or with GitHub CLI:
 
 ```bash
 gh workflow run pages.yml --repo vasrask/activity_stats --ref main
 ```
 
-The Pages deployment serves the already-generated static files; the SQLite
-database is not uploaded and is not required by the hosted site. Keep the
-database on the machine where you collect activity so future runs can continue
-from the saved sync state.
+The Pages deployment serves the already-generated static files; the SQLite database is not uploaded and is not required by the hosted site. Keep the database on the machine where you collect activity so future runs can continue from the saved sync state.

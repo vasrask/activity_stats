@@ -20,7 +20,7 @@ The default tracked repositories are `jenkinsci/jenkins`, `woodpecker-ci/woodpec
 
 ## Collection and refresh
 
-The first collection for a repository requests activity from the configured lookback boundary (400 days by default). Each later run reads that repository's `last_successful_sync` from SQLite and requests data from that point, rechecking the previous day to avoid gaps at the boundary. Events are deduplicated by `(repository, event type, event ID)`. The configured lookback remains a rolling limit, so a repository not collected for longer than that window cannot be backfilled beyond the current window.
+The first collection for a repository requests activity from the configured lookback boundary (400 days by default). If an existing database was first populated with a shorter lookback, a later run expands collection back to the configured boundary. This expansion may retrieve already stored recent activity once; rows are deduplicated by `(repository, event type, event ID)`. After the expanded collection succeeds, each run reads `last_successful_sync` from SQLite and requests only newer activity, rechecking the previous day to avoid gaps. This applies regardless of run frequency. The configured lookback is a rolling limit: if the repository has not been collected for longer than that window, activity before the current window is not backfilled.
 
 The sync watermark is written only after all collection endpoints finish for that repository. If a request fails partway through, already fetched rows may be committed, but the watermark is not advanced; a later run retries the unconfirmed interval. Repository runs are committed independently.
 

@@ -192,6 +192,54 @@ class ActivityStatsTests(unittest.TestCase):
         )
         self.assertEqual(expired_start, now - dt.timedelta(days=400))
 
+    def test_collection_expands_existing_short_history_to_lookback(self) -> None:
+        now = dt.datetime(2026, 11, 15, tzinfo=dt.timezone.utc)
+        old_boundary = now - dt.timedelta(days=200)
+        last_success = now - dt.timedelta(hours=1)
+        self.connection.execute(
+            """
+            INSERT INTO repositories (full_name, html_url, fetched_at)
+            VALUES ('owner/repo', 'https://github.com/owner/repo', ?)
+            """,
+            (activity_stats.timestamp_text(now),),
+        )
+        self.connection.execute(
+            """
+            INSERT INTO repository_sync_state
+                (full_name, initial_since, last_successful_sync)
+            VALUES (?, ?, ?)
+            """,
+            (
+                "owner/repo",
+                activity_stats.timestamp_text(old_boundary),
+                activity_stats.timestamp_text(last_success),
+            ),
+        )
+
+        expanded_start = activity_stats.collection_start(
+            self.connection, "owner/repo", now, 400
+        )
+        self.assertEqual(expanded_start, now - dt.timedelta(days=400))
+
+        activity_stats.save_sync_success(
+            self.connection,
+            "owner/repo",
+            expanded_start,
+            now,
+        )
+        stored_boundary = self.connection.execute(
+            "SELECT initial_since FROM repository_sync_state WHERE full_name = ?",
+            ("owner/repo",),
+        ).fetchone()[0]
+        self.assertEqual(
+            stored_boundary, activity_stats.timestamp_text(expanded_start)
+        )
+
+        next_start = activity_stats.collection_start(
+            self.connection, "owner/repo", now + dt.timedelta(days=1), 400
+        )
+        self.assertEqual(next_start, now - dt.timedelta(days=1))
+
     def test_cumulative_series_accumulates_daily_counts(self) -> None:
         daily = {
             "commit": [[1000, 2], [2000, 0], [3000, 3]],
